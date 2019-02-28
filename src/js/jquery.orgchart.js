@@ -72,6 +72,7 @@
         $chart.append('<i class="fa fa-circle-o-notch fa-spin spinner"></i>');
         $.ajax({
           'url': data,
+          'method' : 'GET',
           'dataType': 'json'
         })
         .done(function(data, textStatus, jqXHR) {
@@ -665,7 +666,12 @@
     },
     // whether the cursor is hovering over the node
     isInAction: function ($node) {
-      return $node.children('.edge').attr('class').indexOf('fa-') > -1 ? true : false;
+    	var edge = $node.children('.edge');
+    	
+    	if(edge.length == 0 || !edge.attr('class'))
+    		return false;
+    	
+      return edge.attr('class').indexOf('fa-') > -1 ? true : false;
     },
     //
     switchVerticalArrow: function ($arrow) {
@@ -736,7 +742,7 @@
     loadNodes: function (rel, url, $edge) {
       var that = this;
       var opts = this.options;
-      $.ajax({ 'url': url, 'dataType': 'json' })
+      $.ajax({ 'url': url, 'dataType': 'json', 'method' : 'GET' })
       .done(function (data) {
         if (that.$chart.data('inAjax')) {
           if (rel === 'parent') {
@@ -796,6 +802,7 @@
     },
     //
     bottomEdgeClickHandler: function (event) {
+    	console.log("receive click");
       event.stopPropagation();
       var $bottomEdge = $(event.target);
       var $node = $(event.delegateTarget);
@@ -1171,10 +1178,10 @@
 
       $nodeDiv.on('mouseenter mouseleave', this.nodeEnterLeaveHandler.bind(this));
       $nodeDiv.on('click', this.nodeClickHandler.bind(this));
-      $nodeDiv.on('click', '.topEdge', this.topEdgeClickHandler.bind(this));
-      $nodeDiv.on('click', '.bottomEdge', this.bottomEdgeClickHandler.bind(this));
-      $nodeDiv.on('click', '.leftEdge, .rightEdge', this.hEdgeClickHandler.bind(this));
-      $nodeDiv.on('click', '.toggleBtn', this.toggleVNodes.bind(this));
+      $nodeDiv.on('click', opts.topEdgeHandler ||  '.topEdge', this.topEdgeClickHandler.bind(this));
+      $nodeDiv.on('click', opts.bottomEdgeHandler || '.bottomEdge', this.bottomEdgeClickHandler.bind(this));
+      $nodeDiv.on('click', opts.leftEdgeHandler || '.leftEdge, .rightEdge', this.hEdgeClickHandler.bind(this));
+      $nodeDiv.on('click', opts.toggleBtnHandler ||  '.toggleBtn', this.toggleVNodes.bind(this));
 
       if (opts.draggable) {
         this.bindDragDrop($nodeDiv);
